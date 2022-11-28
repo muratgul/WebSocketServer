@@ -11,7 +11,7 @@ namespace WebSocketClientApp
         
         static void Main(string[] args)
         {
-            using (WebSocketSharp.WebSocket ws = new WebSocketSharp.WebSocket("ws://127.0.0.1:7890/EchoAll"))
+            using (WebSocketSharp.WebSocket ws = new WebSocketSharp.WebSocket("ws://192.168.0.6:7890/EchoAll"))
             {
                 ws.OnMessage += Ws_OnMessage;
 

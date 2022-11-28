@@ -1,9 +1,58 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
 namespace WebSocketServerApp
 {
+
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+
+            if (ReadSettings.FromConfig("autostart") == "true")
+            {
+                rk.SetValue("VWDWebSocket", System.Reflection.Assembly.GetExecutingAssembly().Location.ToString());
+            }
+            else
+            {
+                rk.DeleteValue("VWDWebSocket", false);
+            }
+
+            Console.Title = "VWD WebSocket Server";
+
+            string url = $@"ws://{ReadSettings.FromConfig("ipadress")}:{ReadSettings.FromConfig("port")}";
+
+            try
+            {
+                WebSocketServer wssv = new WebSocketServer(url);
+
+                //wssv.AddWebSocketService<Echo>("/Echo");
+                wssv.AddWebSocketService<Entegrasyon>("/Entegrasyon");
+                //wssv.AddWebSocketService<HR>("/HR");
+
+                wssv.Start();
+                //Console.WriteLine($"WS server started on {url}/Echo");
+                Console.WriteLine($"WS server started on {url}/Entegrasyon");
+                //Console.WriteLine($"WS server started on {url}/HR");
+
+                Console.ReadKey();
+
+                string command = Console.ReadLine();
+
+                if (command == "exit")
+                {
+                    wssv.Stop();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Hata: " + ex.Message);
+            } 
+        }
+    }
     public class Echo : WebSocketBehavior
     {
         protected override void OnMessage(MessageEventArgs e)
@@ -12,29 +61,21 @@ namespace WebSocketServerApp
             Send(e.Data);
         }
     }
-    public class EchoAll : WebSocketBehavior
+    public class Entegrasyon : WebSocketBehavior
     {
         protected override void OnMessage(MessageEventArgs e)
         {
-            Console.WriteLine("Received message from EchoAll client: " + e.Data);
+            Console.WriteLine("Entegrasyon client: " + e.Data);
             Sessions.Broadcast(e.Data);
         }
     }
-    internal class Program
+
+    public class HR : WebSocketBehavior
     {
-        static void Main(string[] args)
+        protected override void OnMessage(MessageEventArgs e)
         {
-            WebSocketServer wssv = new WebSocketServer("ws://192.168.0.6:7890");
-
-            wssv.AddWebSocketService<Echo>("/Echo");
-            wssv.AddWebSocketService<EchoAll>("/EchoAll");
-
-            wssv.Start();
-            Console.WriteLine("WS server started on ws://192.168.0.6:7890/Echo");
-            Console.WriteLine("WS server started on ws://192.168.0.6:7890/EchoAll");
-
-            Console.ReadKey();
-            wssv.Stop();
+            Console.WriteLine("HR client: " + e.Data);
+            Sessions.Broadcast(e.Data);
         }
     }
 }
