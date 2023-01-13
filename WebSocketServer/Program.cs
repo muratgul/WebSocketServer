@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Net;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -10,6 +11,7 @@ namespace WebSocketServerApp
     {
         static void Main(string[] args)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
 
             if (ReadSettings.FromConfig("autostart") == "true")
@@ -31,12 +33,12 @@ namespace WebSocketServerApp
 
                 //wssv.AddWebSocketService<Echo>("/Echo");
                 wssv.AddWebSocketService<Entegrasyon>("/Entegrasyon");
-                //wssv.AddWebSocketService<HR>("/HR");
+                wssv.AddWebSocketService<HR>("/HR");
 
                 wssv.Start();
                 //Console.WriteLine($"WS server started on {url}/Echo");
                 Console.WriteLine($"WS server started on {url}/Entegrasyon");
-                //Console.WriteLine($"WS server started on {url}/HR");
+                Console.WriteLine($"WS server started on {url}/HR");
 
                 Console.ReadKey();
 
