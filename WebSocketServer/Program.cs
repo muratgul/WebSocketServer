@@ -11,6 +11,7 @@ namespace WebSocketServerApp
     {
         static void Main(string[] args)
         {
+
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             RegistryKey rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
 
@@ -31,13 +32,12 @@ namespace WebSocketServerApp
             {
                 WebSocketServer wssv = new WebSocketServer(url);
 
-                //wssv.AddWebSocketService<Echo>("/Echo");
                 wssv.AddWebSocketService<Entegrasyon>("/Entegrasyon");
                 wssv.AddWebSocketService<HR>("/HR");
                 wssv.AddWebSocketService<Sevkiyat>("/Sevkiyat");
 
                 wssv.Start();
-                //Console.WriteLine($"WS server started on {url}/Echo");
+
                 Console.WriteLine($"WS server started on {url}/Entegrasyon");
                 Console.WriteLine($"WS server started on {url}/HR");
                 Console.WriteLine($"WS server started on {url}/Sevkiyat");
@@ -50,21 +50,17 @@ namespace WebSocketServerApp
                 {
                     wssv.Stop();
                 }
+
+                wssv.Stop();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Hata: " + ex.Message);
-            } 
+            }
+            
         }
     }
-    public class Echo : WebSocketBehavior
-    {
-        protected override void OnMessage(MessageEventArgs e)
-        {
-            Console.WriteLine("Received message from Echo client: " + e.Data);
-            Send(e.Data);
-        }
-    }
+
     public class Entegrasyon : WebSocketBehavior
     {
         protected override void OnMessage(MessageEventArgs e)
